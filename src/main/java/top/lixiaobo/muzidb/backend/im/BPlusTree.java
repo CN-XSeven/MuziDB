@@ -17,16 +17,21 @@ import top.lixiaobo.muzidb.backend.utils.Parser;
 
 public class BPlusTree {
     DataManager dm;
-    long bootUid;
+    long bootUid;  //根节点在文件中保存的位置
     DataItem bootDataItem;
     Lock bootLock;
 
     public static long create(DataManager dm) throws Exception {
         byte[] rawRoot = Node.newNilRootRaw();
+        //Uid 已经保存了页号与偏移量
         long rootUid = dm.insert(TransactionManagerImpl.SUPER_XID, rawRoot);
+
+        //将头节点的位置插入到页面里面
+        //然后把位置返回
         return dm.insert(TransactionManagerImpl.SUPER_XID, Parser.long2Byte(rootUid));
     }
 
+    //加载B+树,传入根Uid + DM 然后初始化
     public static BPlusTree load(long bootUid, DataManager dm) throws Exception {
         DataItem bootDataItem = dm.read(bootUid);
         assert bootDataItem != null;
@@ -38,6 +43,8 @@ public class BPlusTree {
         return t;
     }
 
+
+    // 获取根节点
     private long rootUid() {
         bootLock.lock();
         try {

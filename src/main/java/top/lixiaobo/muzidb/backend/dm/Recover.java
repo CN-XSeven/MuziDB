@@ -42,6 +42,9 @@ public class Recover {
         byte[] newRaw;
     }
 
+
+
+
     public static void recover(TransactionManager tm, Logger lg, PageCache pc) {
         System.out.println("Recovering...");
 
@@ -139,6 +142,8 @@ public class Recover {
             tm.abort(entry.getKey());
         }
     }
+
+
 
     private static boolean isInsertLog(byte[] log) {
         return log[0] == LOG_TYPE_INSERT;

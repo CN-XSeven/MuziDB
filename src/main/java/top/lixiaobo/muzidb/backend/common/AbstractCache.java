@@ -41,9 +41,8 @@ public abstract class AbstractCache<T> {
                 }
                 continue;
             }
-
+            // 资源在缓存中，直接返回
             if(cache.containsKey(key)) {
-                // 资源在缓存中，直接返回
                 T obj = cache.get(key);
                 references.put(key, references.get(key) + 1);
                 lock.unlock();

@@ -28,6 +28,7 @@ public class Node {
     SubArray raw;
     long uid;
 
+    //设置是否是叶子节点
     static void setRawIsLeaf(SubArray raw, boolean isLeaf) {
         if(isLeaf) {
             raw.raw[raw.start + IS_LEAF_OFFSET] = (byte)1;
@@ -35,46 +36,52 @@ public class Node {
             raw.raw[raw.start + IS_LEAF_OFFSET] = (byte)0;
         }
     }
-
+    //判断是否是叶子节点
     static boolean getRawIfLeaf(SubArray raw) {
         return raw.raw[raw.start + IS_LEAF_OFFSET] == (byte)1;
     }
-
+    //设置子节点个数
     static void setRawNoKeys(SubArray raw, int noKeys) {
         System.arraycopy(Parser.short2Byte((short)noKeys), 0, raw.raw, raw.start+NO_KEYS_OFFSET, 2);
     }
-
+    //获取子节点个数
     static int getRawNoKeys(SubArray raw) {
         return (int)Parser.parseShort(Arrays.copyOfRange(raw.raw, raw.start+NO_KEYS_OFFSET, raw.start+NO_KEYS_OFFSET+2));
     }
-
+    //设置其兄弟节点的UID
     static void setRawSibling(SubArray raw, long sibling) {
         System.arraycopy(Parser.long2Byte(sibling), 0, raw.raw, raw.start+SIBLING_OFFSET, 8);
     }
-
+    //获取其兄弟节点UID
     static long getRawSibling(SubArray raw) {
         return Parser.parseLong(Arrays.copyOfRange(raw.raw, raw.start+SIBLING_OFFSET, raw.start+SIBLING_OFFSET+8));
     }
 
+
+    //设置第几个son
     static void setRawKthSon(SubArray raw, long uid, int kth) {
         int offset = raw.start+NODE_HEADER_SIZE+kth*(8*2);
         System.arraycopy(Parser.long2Byte(uid), 0, raw.raw, offset, 8);
     }
-
+    //得到第几个son
     static long getRawKthSon(SubArray raw, int kth) {
         int offset = raw.start+NODE_HEADER_SIZE+kth*(8*2);
         return Parser.parseLong(Arrays.copyOfRange(raw.raw, offset, offset+8));
     }
 
+    //设置第几个son的key
     static void setRawKthKey(SubArray raw, long key, int kth) {
         int offset = raw.start+NODE_HEADER_SIZE+kth*(8*2)+8;
         System.arraycopy(Parser.long2Byte(key), 0, raw.raw, offset, 8);
     }
-
+    //得到第几个son的key
     static long getRawKthKey(SubArray raw, int kth) {
         int offset = raw.start+NODE_HEADER_SIZE+kth*(8*2)+8;
         return Parser.parseLong(Arrays.copyOfRange(raw.raw, offset, offset+8));
     }
+
+
+
 
     static void copyRawFromKth(SubArray from, SubArray to, int kth) {
         int offset = from.start+NODE_HEADER_SIZE+kth*(8*2);
@@ -89,17 +96,19 @@ public class Node {
         }
     }
 
+
+
     static byte[] newRootRaw(long left, long right, long key)  {
         SubArray raw = new SubArray(new byte[NODE_SIZE], 0, NODE_SIZE);
-
         setRawIsLeaf(raw, false);
         setRawNoKeys(raw, 2);
         setRawSibling(raw, 0);
+
         setRawKthSon(raw, left, 0);
         setRawKthKey(raw, key, 0);
+
         setRawKthSon(raw, right, 1);
         setRawKthKey(raw, Long.MAX_VALUE, 1);
-
         return raw.raw;
     }
 
@@ -112,6 +121,9 @@ public class Node {
 
         return raw.raw;
     }
+
+
+
 
     static Node loadNode(BPlusTree bTree, long uid) throws Exception {
         DataItem di = bTree.dm.read(uid);
@@ -137,6 +149,9 @@ public class Node {
         }
     }
 
+
+
+    // 查询下一个节点
     class SearchNextRes {
         long uid;
         long siblingUid;
@@ -164,6 +179,7 @@ public class Node {
         }
     }
 
+    //范围查询下一个节点
     class LeafSearchRangeRes {
         List<Long> uids;
         long siblingUid;
@@ -172,8 +188,11 @@ public class Node {
     public LeafSearchRangeRes leafSearchRange(long leftKey, long rightKey) {
         dataItem.rLock();
         try {
+            //当前节点有多少个儿子节点
             int noKeys = getRawNoKeys(raw);
             int kth = 0;
+
+            //找到leftKey在Node的数据中是第几个SnoKey组合
             while(kth < noKeys) {
                 long ik = getRawKthKey(raw, kth);
                 if(ik >= leftKey) {
@@ -182,6 +201,8 @@ public class Node {
                 kth ++;
             }
             List<Long> uids = new ArrayList<>();
+
+            //将这个方位内的SonN全保存下来
             while(kth < noKeys) {
                 long ik = getRawKthKey(raw, kth);
                 if(ik <= rightKey) {
@@ -192,6 +213,8 @@ public class Node {
                 }
             }
             long siblingUid = 0;
+
+            //有可能不止这个节点有，所以把它的兄弟节点保存下来
             if(kth == noKeys) {
                 siblingUid = getRawSibling(raw);
             }
@@ -203,6 +226,9 @@ public class Node {
             dataItem.rUnLock();
         }
     }
+
+
+
 
     class InsertAndSplitRes {
         long siblingUid, newSon, newKey;
