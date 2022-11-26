@@ -17,6 +17,7 @@ public class LockTable {
     
     private Map<Long, List<Long>> x2u;  // 某个XID已经获得的资源的UID列表
     private Map<Long, Long> u2x;        // UID被某个XID持有
+
     private Map<Long, List<Long>> wait; // 正在等待UID的XID列表
     private Map<Long, Lock> waitLock;   // 正在等待资源的XID的锁
     private Map<Long, Long> waitU;      // XID正在等待的UID
@@ -121,7 +122,6 @@ public class LockTable {
         }
         return false;
     }
-
     private boolean dfs(long xid) {
         Integer stp = xidStamp.get(xid);
         if(stp != null && stp == stamp) {
@@ -131,7 +131,6 @@ public class LockTable {
             return false;
         }
         xidStamp.put(xid, stamp);
-
         Long uid = waitU.get(xid);
         if(uid == null) return false;
         Long x = u2x.get(uid);

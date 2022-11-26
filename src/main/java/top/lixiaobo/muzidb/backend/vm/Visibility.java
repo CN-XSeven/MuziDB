@@ -20,7 +20,6 @@ public class Visibility {
             return repeatableRead(tm, t, e);
         }
     }
-
     private static boolean readCommitted(TransactionManager tm, Transaction t, Entry e) {
         long xid = t.xid;
         long xmin = e.getXmin();

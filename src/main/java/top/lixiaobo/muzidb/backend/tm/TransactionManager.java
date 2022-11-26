@@ -20,7 +20,6 @@ public interface TransactionManager {
     void close();
 
     public static TransactionManagerImpl create(String path) {
-        System.out.println(path+"=====================");
         File f = new File(path+TransactionManagerImpl.XID_SUFFIX);
         try {
             if(!f.createNewFile()) {

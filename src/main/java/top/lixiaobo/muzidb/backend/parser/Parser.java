@@ -80,6 +80,7 @@ public class Parser {
         return stat;
     }
 
+    //
     private static Show parseShow(Tokenizer tokenizer) throws Exception {
         String tmp = tokenizer.peek();
         if("".equals(tmp)) {
@@ -87,6 +88,9 @@ public class Parser {
         }
         throw Error.InvalidCommandException;
     }
+
+
+
 
     private static Update parseUpdate(Tokenizer tokenizer) throws Exception {
         Update update = new Update();
@@ -250,6 +254,8 @@ public class Parser {
         return where;
     }
 
+
+    //
     private static SingleExpression parseSingleExp(Tokenizer tokenizer) throws Exception {
         SingleExpression exp = new SingleExpression();
         
@@ -272,14 +278,17 @@ public class Parser {
         return exp;
     }
 
+    //
     private static boolean isCmpOp(String op) {
         return ("=".equals(op) || ">".equals(op) || "<".equals(op));
     }
 
+    //
     private static boolean isLogicOp(String op) {
         return ("and".equals(op) || "or".equals(op));
     }
 
+    //
     private static Drop parseDrop(Tokenizer tokenizer) throws Exception {
         if(!"table".equals(tokenizer.peek())) {
             throw Error.InvalidCommandException;
@@ -300,6 +309,7 @@ public class Parser {
         drop.tableName = tableName;
         return drop;
     }
+
 
     private static Create parseCreate(Tokenizer tokenizer) throws Exception {
         if(!"table".equals(tokenizer.peek())) {
@@ -377,6 +387,7 @@ public class Parser {
         return create;
     }
 
+    //
     private static boolean isType(String tp) {
         return ("int32".equals(tp) || "int64".equals(tp) ||
         "string".equals(tp));
