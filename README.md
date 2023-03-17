@@ -65,6 +65,3 @@ Data 就是数据
 ![在这里插入图片描述](https://img-blog.csdnimg.cn/c6b6e9c35aa24598856bbeb34d7a2376.png)
 
 
-## 查看更详细内容可以点击进我的博客去了解
-
-**[才疏学浅的木子](http://www.xiaolicoding.top/)** 欢迎大家访问
